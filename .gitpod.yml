@@ -9,5 +9,4 @@ ports:
     onOpen: open-preview
     visibility: public
   - port: 8080
-    onOpen: open-preview 
     visibility: public
