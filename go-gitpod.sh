@@ -25,3 +25,5 @@ then
   echo "Guru-shifu started successfully..."
   open http://localhost:3000/
 fi
+
+sudo chmod -R 777 guru-shifu
