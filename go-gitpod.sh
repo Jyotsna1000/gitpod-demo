@@ -25,6 +25,3 @@ then
   echo "Guru-shifu started successfully..."
   open http://localhost:3000/
 fi
-printf "\n\n"
-read -n 1 -s -r -p "Press any key to close this window....."
-
