@@ -1,7 +1,7 @@
 # List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
 workspaceLocation: "guru-shifu"
 tasks:
-  - init: ./go-gitpod.sh  # run the shell script to setup
+  - init: ./.ignore/go-gitpod.sh  # run the shell script to setup
     command: echo 'start script'
 
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
