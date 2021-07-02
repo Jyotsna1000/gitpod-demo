@@ -2,7 +2,7 @@
 #workspaceLocation: "guru-shifu"
 tasks:
   #- before: echo "Setting up guru shifu. This may take 5 minutes.." 
-   - init: ./.ignore/go-gitpod.sh  >> .ignore/log.txt # run the shell script to setup
+  - init: ./.ignore/go-gitpod.sh  >> .ignore/log.txt # run the shell script to setup
     command: echo 'Guru Shifu Started'
 
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
