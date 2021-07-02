@@ -9,11 +9,6 @@ tar -xf guru-shifu.tar.gz
 touch .env
  echo 'WORKSPACE_PATH=/workspace/gitpod' >> .env
  echo "REACT_APP_HOST_URL=https://8080-${GITPOD_WORKSPACE_URL#*//}" >> .env
-
-
-echo "Locating required resources..."
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-cd $DIR
 echo "Loading guru-shifu images..."
 docker load -i guru-shifu-images.tar.gz
 echo "Starting guru-shifu..."
