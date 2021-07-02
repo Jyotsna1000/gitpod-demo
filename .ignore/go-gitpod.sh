@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+echo "Locating required resources..."
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd $DIR
+
 curl --output guru-shifu.tar.gz "https://guru-shifu-artifacts.s3.ap-south-1.amazonaws.com/Guru-Shifu-Trainee-Output/outputDev/guru-shifu-neev-dev.tar.gz"
 tar -xf guru-shifu.tar.gz
 
