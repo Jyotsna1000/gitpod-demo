@@ -1,5 +1,7 @@
 FROM gitpod/workspace-base:latest
 ### Docker ###
+LABEL dazzle/layer=tool-docker
+LABEL dazzle/test=tests/tool-docker.yaml
 USER gitpod
 ENV TRIGGER_REBUILD=2
 # https://docs.docker.com/engine/install/ubuntu/
