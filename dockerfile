@@ -61,7 +61,7 @@ ENV NGINX_DOCROOT_IN_REPO="public"
 ### Homebrew ###
 LABEL dazzle/layer=tool-brew
 LABEL dazzle/test=tests/tool-brew.yaml
-USER root
+USER gitpod
 # Dazzle does not rebuild a layer until one of its lines are changed. Increase this counter to rebuild this layer.
 ENV TRIGGER_BREW_REBUILD=2
 RUN mkdir ~/.cache && /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -75,7 +75,7 @@ RUN sudo apt remove -y cmake \
 ### Go ###
 LABEL dazzle/layer=lang-go
 LABEL dazzle/test=tests/lang-go.yaml
-USER root
+USER gitpod
 ENV GO_VERSION=1.16.5
 ENV GOPATH=$HOME/go-packages
 ENV GOROOT=$HOME/go
@@ -117,7 +117,7 @@ ENV GOPATH=/workspace/go \
 ## Place '.gradle' and 'm2-repository' in /workspace because (1) that's a fast volume, (2) it survives workspace-restarts and (3) it can be warmed-up by pre-builds.
 LABEL dazzle/layer=lang-java
 LABEL dazzle/test=tests/lang-java.yaml
-USER root
+USER gitpod
 RUN curl -fsSL "https://get.sdkman.io" | bash \
  && bash -c ". /home/gitpod/.sdkman/bin/sdkman-init.sh \
              && sdk install java 11.0.11.fx-zulu \
@@ -135,7 +135,7 @@ ENV GRADLE_USER_HOME=/workspace/.gradle/
 ### Node.js ###
 LABEL dazzle/layer=lang-node
 LABEL dazzle/test=tests/lang-node.yaml
-USER root
+USER gitpod
 ENV NODE_VERSION=14.17.2
 ENV TRIGGER_REBUILD=1
 RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | PROFILE=/dev/null bash \
@@ -151,7 +151,7 @@ ENV PATH=$PATH:/home/gitpod/.nvm/versions/node/v${NODE_VERSION}/bin
 ### Python ###
 LABEL dazzle/layer=lang-python
 LABEL dazzle/test=tests/lang-python.yaml
-USER root
+USER gitpod
 RUN sudo install-packages python3-pip
 
 ENV PATH=$HOME/.pyenv/bin:$HOME/.pyenv/shims:$PATH
@@ -175,7 +175,7 @@ RUN curl -fsSL https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-ins
 ### Ruby ###
 LABEL dazzle/layer=lang-ruby
 LABEL dazzle/test=tests/lang-ruby.yaml
-USER root
+USER gitpod
 RUN curl -fsSL https://rvm.io/mpapis.asc | gpg --import - \
     && curl -fsSL https://rvm.io/pkuczynski.asc | gpg --import - \
     && curl -fsSL https://get.rvm.io | bash -s stable \
@@ -192,7 +192,7 @@ RUN echo "rvm_gems_path=/workspace/.rvm" > ~/.rvmrc
 ### Rust ###
 LABEL dazzle/layer=lang-rust
 LABEL dazzle/test=tests/lang-rust.yaml
-USER root
+USER gitpod
 RUN cp /home/gitpod/.profile /home/gitpod/.profile_orig && \
     curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.53.0 \
     && .cargo/bin/rustup component add \
@@ -210,7 +210,7 @@ RUN bash -lc "cargo install cargo-watch cargo-edit cargo-tree"
 ### Docker ###
 LABEL dazzle/layer=tool-docker
 LABEL dazzle/test=tests/tool-docker.yaml
-USER root
+USER gitpod
 ENV TRIGGER_REBUILD=2
 # https://docs.docker.com/engine/install/ubuntu/
 RUN curl -o /var/lib/apt/dazzle-marks/docker.gpg -fsSL https://download.docker.com/linux/ubuntu/gpg \
@@ -229,5 +229,22 @@ RUN curl -o /tmp/dive.deb -fsSL https://github.com/wagoodman/dive/releases/downl
     && apt install /tmp/dive.deb \
     && rm /tmp/dive.deb
 
-
+### Prologue (built across all layers) ###
+LABEL dazzle/layer=dazzle-prologue
+LABEL dazzle/test=tests/prologue.yaml
 USER root
+RUN curl -o /usr/bin/dazzle-util -fsSL https://github.com/csweichel/dazzle/releases/download/v0.0.3/dazzle-util_0.0.3_Linux_x86_64 \
+    && chmod +x /usr/bin/dazzle-util
+# merge dpkg status files
+RUN cp /var/lib/dpkg/status /tmp/dpkg-status \
+    && for i in $(ls /var/lib/apt/dazzle-marks/*.status); do /usr/bin/dazzle-util debian dpkg-status-merge /tmp/dpkg-status $i > /tmp/dpkg-status; done \
+    && cp -f /var/lib/dpkg/status /var/lib/dpkg/status-old \
+    && cp -f /tmp/dpkg-status /var/lib/dpkg/status
+# correct the path as per https://github.com/gitpod-io/gitpod/issues/4508
+ENV PATH=$PATH:/usr/games
+# merge GPG keys for trusted APT repositories
+RUN for i in $(ls /var/lib/apt/dazzle-marks/*.gpg); do apt-key add "$i"; done
+# copy tests to enable the self-test of this image
+COPY tests /var/lib/dazzle/tests
+
+USER gitpod
