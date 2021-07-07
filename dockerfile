@@ -1,4 +1,4 @@
-FROM gradle:jdk15
+FROM gitpod/workspace-base:latest
 ### Docker ###
 USER gitpod
 ENV TRIGGER_REBUILD=2
