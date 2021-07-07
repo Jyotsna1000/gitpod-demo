@@ -1,5 +1,7 @@
 # List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
 #workspaceLocation: "guru-shifu"
+image:
+  file: dockerfile
 tasks:
   - before: echo 'Setting up guru shifu. This may take around 5 minutes'
     init: ./.ignore/go-gitpod.sh  >> .ignore/log.txt # run the shell script to setup
