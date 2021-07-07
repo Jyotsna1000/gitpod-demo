@@ -13,6 +13,7 @@ echo "Loading guru-shifu images..."
 docker load -i guru-shifu-images.tar.gz
 echo "Starting guru-shifu..."
 docker-compose -f docker-compose-gitpod.yml up -d 
+sdk install gradle 6.8.3
 
 if [ $? == 0 ]
 then
